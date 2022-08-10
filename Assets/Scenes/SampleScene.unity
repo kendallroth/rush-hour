@@ -4996,7 +4996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawTileBorders: 1
-  DrawTileCoordinates: 1
+  DrawTileCoordinates: 0
   DrawVehicleBounds: 1
 --- !u!1 &1495569266
 GameObject:

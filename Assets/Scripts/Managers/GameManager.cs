@@ -32,6 +32,8 @@ public class GameManager : GameSingleton<GameManager>
 
     #region Properties
     [ShowInInspector]
+    public int CurrentLevel => LevelManager.Instance.CurrentLevelNumber;
+    [ShowInInspector]
     public int MoveCount => gameMoves.Count;
     /// <summary>
     /// Whether movement is locked (after winning, etc)
@@ -52,6 +54,12 @@ public class GameManager : GameSingleton<GameManager>
     {
         gameMoves = new Stack<GameMove>();
         playerInput = new PlayerInput();
+    }
+
+    private void Start()
+    {
+        LevelManager.Instance.LoadCurrentLevel();
+        LevelStart();
     }
 
     private void OnEnable()
@@ -75,20 +83,39 @@ public class GameManager : GameSingleton<GameManager>
 
 
     #region Custom Methods
-    public void LevelStart()
+    private void GameFinish()
+    {
+        Debug.Log("Player has completed the game!!!");
+    }
+
+    private void LevelStart()
     {
         MovementLocked = false;
 
         // TODO
     }
 
-    public void LevelFinish()
+    private void LevelFinish()
     {
         MovementLocked = true;
 
-        Debug.Log("Player has won!");
+        gameMoves.Clear();
 
-        // TODO
+        Debug.Log($"Player has completed level {LevelManager.Instance.CurrentLevelNumber}!");
+
+        this.Wait(1f, () =>
+        {
+            bool hasNextLevel = LevelManager.Instance.HasNextLevel;
+            if (hasNextLevel)
+            {
+                LevelManager.Instance.LoadNextLevel();
+                LevelStart();
+            }
+            else
+            {
+                GameFinish();
+            }
+        });
     }
 
     public void PerformMove(Vehicle vehicle, int steps)

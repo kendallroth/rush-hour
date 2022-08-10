@@ -23,7 +23,7 @@ public class LevelManager : GameSingleton<LevelManager>
             return;
         }
 
-        LoadLevel(CurrentLevelNumber);
+        LoadCurrentLevel();
     }
     #endregion
 
@@ -40,16 +40,19 @@ public class LevelManager : GameSingleton<LevelManager>
 
 
     #region Unity Methods
-    private void Start()
+    private void Awake()
     {
         // TODO: Eventually load all levels (rather than serialize???)
-
-        LoadLevel(CurrentLevelNumber);
     }
     #endregion
 
 
     #region Custom Methods
+    public void LoadCurrentLevel()
+    {
+        LoadLevel(CurrentLevelNumber);
+    }
+
     public void LoadLevel(int level)
     {
         currentLevelNumber = level;
