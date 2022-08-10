@@ -96,8 +96,8 @@ public class GameManager : GameSingleton<GameManager>
 
         // TODO
 
-        LevelStartData levelLoadData = new LevelStartData(CurrentLevel, LevelNumber);
-        MessageDispatcher.SendMessageData(GameEvents.LEVEL__START, levelLoadData);
+        LevelStartData levelStartData = new LevelStartData(CurrentLevel, LevelNumber);
+        MessageDispatcher.SendMessageData(GameEvents.LEVEL__START, levelStartData, -1);
     }
 
     private void LevelFinish()
@@ -165,7 +165,7 @@ public class GameManager : GameSingleton<GameManager>
         int previousMoveCount = MoveCount;
         UndoMoves(MoveCount);
 
-        LevelResetData levelResetData = new LevelResetData(previousMoveCount);
+        LevelResetData levelResetData = new LevelResetData(CurrentLevel, LevelNumber, previousMoveCount);
         MessageDispatcher.SendMessageData(GameEvents.LEVEL__RESET, levelResetData);
     }
 
