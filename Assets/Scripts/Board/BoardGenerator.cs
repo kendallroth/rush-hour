@@ -59,8 +59,6 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
     {
         ClearBoard();
 
-        Debug.Log("Generating game board");
-
         // Parse and validate vehicle positions
         List<VehicleConfig> vehiclePositions = ParseVehiclePositions(level);
         Debug.Log($"Parsed {vehiclePositions.Count} positions");

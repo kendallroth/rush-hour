@@ -1,3 +1,4 @@
+using com.ootii.Messages;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,8 +32,9 @@ public class GameManager : GameSingleton<GameManager>
 
 
     #region Properties
+    public Level CurrentLevel => LevelManager.Instance.CurrentLevel;
     [ShowInInspector]
-    public int CurrentLevel => LevelManager.Instance.CurrentLevelNumber;
+    public int LevelNumber => LevelManager.Instance.CurrentLevelNumber;
     [ShowInInspector]
     public int MoveCount => gameMoves.Count;
     /// <summary>
@@ -85,7 +87,7 @@ public class GameManager : GameSingleton<GameManager>
     #region Custom Methods
     private void GameFinish()
     {
-        Debug.Log("Player has completed the game!!!");
+        MessageDispatcher.SendMessage(GameEvents.GAME__COMPLETE);
     }
 
     private void LevelStart()
@@ -93,15 +95,20 @@ public class GameManager : GameSingleton<GameManager>
         MovementLocked = false;
 
         // TODO
+
+        LevelStartData levelLoadData = new LevelStartData(CurrentLevel, LevelNumber);
+        MessageDispatcher.SendMessageData(GameEvents.LEVEL__START, levelLoadData);
     }
 
     private void LevelFinish()
     {
         MovementLocked = true;
 
+        int previousMoveCount = MoveCount;
         gameMoves.Clear();
 
-        Debug.Log($"Player has completed level {LevelManager.Instance.CurrentLevelNumber}!");
+        LevelCompleteData levelCompleteData = new LevelCompleteData(CurrentLevel, LevelNumber, previousMoveCount);
+        MessageDispatcher.SendMessageData(GameEvents.LEVEL__COMPLETE, levelCompleteData);
 
         this.Wait(1f, () =>
         {
@@ -126,11 +133,12 @@ public class GameManager : GameSingleton<GameManager>
 
         vehicle.MoveByStep(steps);
 
-        gameMoves.Push(new GameMove(vehicle, steps));
+        GameMove move = new GameMove(vehicle, steps);
+        gameMoves.Push(move);
 
-        Debug.Log($"Moved {vehicle.Key} by {steps} steps (move {MoveCount})");
+        MoveOperationData movePerformData = new MoveOperationData(move, MoveCount);
+        MessageDispatcher.SendMessageData(GameEvents.MOVE__PERFORM, movePerformData);
 
-        Debug.Log($"{vehicle.PositionIdxStart} {Board.EXIT_START_POSITION}");
         if (vehicle.PlayerVehicle && vehicle.PositionIdxStart == Board.EXIT_START_POSITION)
         {
             LevelFinish();
@@ -146,16 +154,19 @@ public class GameManager : GameSingleton<GameManager>
 
         UndoMoves(1);
 
-        Debug.Log($"Undid previous move for {move.Vehicle.Key} by {-move.Steps} steps");
+        MoveOperationData moveUndoData = new MoveOperationData(move, MoveCount);
+        MessageDispatcher.SendMessageData(GameEvents.MOVE__UNDO, moveUndoData);
     }
 
     public void PerformReset()
     {
         if (MovementLocked || MoveCount <= 0) return;
 
-        Debug.Log($"Reset game ({MoveCount} moves)");
-
+        int previousMoveCount = MoveCount;
         UndoMoves(MoveCount);
+
+        LevelResetData levelResetData = new LevelResetData(previousMoveCount);
+        MessageDispatcher.SendMessageData(GameEvents.LEVEL__RESET, levelResetData);
     }
 
     private void UndoMoves(int moves = 1)
