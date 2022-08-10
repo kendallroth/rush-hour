@@ -42,6 +42,8 @@ public class LevelManager : GameSingleton<LevelManager>
     #region Unity Methods
     private void Start()
     {
+        // TODO: Eventually load all levels (rather than serialize???)
+
         LoadCurrentLevel();
     }
     #endregion

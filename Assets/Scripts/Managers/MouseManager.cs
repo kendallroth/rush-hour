@@ -85,8 +85,6 @@ public class MouseManager : GameSingleton<MouseManager>
         Vehicle vehicle = hit.collider.GetComponentInParent<Vehicle>();
         if (vehicle == null) return;
 
-        Debug.Log($"Moving: {vehicle.Key}");
-
         Vector3 dragStart = MouseUtilities.GetMouseLookPoint(mousePosition, vehicle.transform.position.y);
         var moveBounds = Board.Instance.GetMoveBounds(vehicle);
 
@@ -119,7 +117,6 @@ public class MouseManager : GameSingleton<MouseManager>
 
         // Calculate closest point to the mouse between the vehicle movement position bounds,
         //   to prevent dragging the vehicle past its bounds.
-        //var boundsCenters = Board.Instance.GetMoveBoundsCenters(selectedVehicle);
         Vector3 dragPosition = Vector3Extensions.ClosestPointOnLineFinite(moveBounds.CenterPositionMin, moveBounds.CenterPositionMax, mousePosition - mouseSelection.Value.DragOffsetStart);
 
         selectedVehicle.transform.position = dragPosition;
@@ -137,10 +134,18 @@ public class MouseManager : GameSingleton<MouseManager>
         Vector3 moveDelta = vehiclePositionEnd - vehiclePositionStart;
         float moveDistance = selectedVehicle.Orientation == Orientation.HORIZONTAL ? moveDelta.x : -moveDelta.z;
 
-        float steps = (int)Mathf.Round(moveDistance / boardTileSize);
-        steps = steps.Clamp(moveBounds.StepsBackward, moveBounds.StepsForward);
+        float stepsRaw = Mathf.Round(moveDistance / boardTileSize);
+        int steps = (int)stepsRaw.Clamp(moveBounds.StepsBackward, moveBounds.StepsForward);
 
-        selectedVehicle.MoveByStep((int)steps);
+        // Only perform move if vehicle actually moved by at least a step, otherwise return to original position
+        if (steps != 0)
+        {
+            GameManager.Instance.PerformMove(selectedVehicle, steps);
+        }
+        else
+        {
+            selectedVehicle.Snap();
+        }
 
         ClearSelection();
     }

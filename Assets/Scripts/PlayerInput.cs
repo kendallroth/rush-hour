@@ -90,6 +90,54 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Keys"",
+            ""id"": ""1185c3f8-7465-4af6-834f-4ed775b65cd1"",
+            ""actions"": [
+                {
+                    ""name"": ""Undo"",
+                    ""type"": ""Button"",
+                    ""id"": ""ef640f94-df21-47b5-8dc1-39332de32ef8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Reset"",
+                    ""type"": ""Button"",
+                    ""id"": ""f43456b7-b627-4e07-bf8b-4b6c44d2c4e0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""91db4f5b-01e6-41ab-aca3-75f9815e1edf"",
+                    ""path"": ""<Keyboard>/u"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Undo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ce1806ad-318f-4aa2-8d92-316424629ed8"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Reset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -116,6 +164,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_Mouse_Click = m_Mouse.FindAction("Click", throwIfNotFound: true);
         m_Mouse_Move = m_Mouse.FindAction("Move", throwIfNotFound: true);
         m_Mouse_Delta = m_Mouse.FindAction("Delta", throwIfNotFound: true);
+        // Keys
+        m_Keys = asset.FindActionMap("Keys", throwIfNotFound: true);
+        m_Keys_Undo = m_Keys.FindAction("Undo", throwIfNotFound: true);
+        m_Keys_Reset = m_Keys.FindAction("Reset", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -220,6 +272,47 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         }
     }
     public MouseActions @Mouse => new MouseActions(this);
+
+    // Keys
+    private readonly InputActionMap m_Keys;
+    private IKeysActions m_KeysActionsCallbackInterface;
+    private readonly InputAction m_Keys_Undo;
+    private readonly InputAction m_Keys_Reset;
+    public struct KeysActions
+    {
+        private @PlayerInput m_Wrapper;
+        public KeysActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Undo => m_Wrapper.m_Keys_Undo;
+        public InputAction @Reset => m_Wrapper.m_Keys_Reset;
+        public InputActionMap Get() { return m_Wrapper.m_Keys; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(KeysActions set) { return set.Get(); }
+        public void SetCallbacks(IKeysActions instance)
+        {
+            if (m_Wrapper.m_KeysActionsCallbackInterface != null)
+            {
+                @Undo.started -= m_Wrapper.m_KeysActionsCallbackInterface.OnUndo;
+                @Undo.performed -= m_Wrapper.m_KeysActionsCallbackInterface.OnUndo;
+                @Undo.canceled -= m_Wrapper.m_KeysActionsCallbackInterface.OnUndo;
+                @Reset.started -= m_Wrapper.m_KeysActionsCallbackInterface.OnReset;
+                @Reset.performed -= m_Wrapper.m_KeysActionsCallbackInterface.OnReset;
+                @Reset.canceled -= m_Wrapper.m_KeysActionsCallbackInterface.OnReset;
+            }
+            m_Wrapper.m_KeysActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Undo.started += instance.OnUndo;
+                @Undo.performed += instance.OnUndo;
+                @Undo.canceled += instance.OnUndo;
+                @Reset.started += instance.OnReset;
+                @Reset.performed += instance.OnReset;
+                @Reset.canceled += instance.OnReset;
+            }
+        }
+    }
+    public KeysActions @Keys => new KeysActions(this);
     private int m_KeyboardSchemeIndex = -1;
     public InputControlScheme KeyboardScheme
     {
@@ -234,5 +327,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnClick(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
         void OnDelta(InputAction.CallbackContext context);
+    }
+    public interface IKeysActions
+    {
+        void OnUndo(InputAction.CallbackContext context);
+        void OnReset(InputAction.CallbackContext context);
     }
 }

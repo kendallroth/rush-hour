@@ -27,7 +27,7 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
 
     [Header("Level")]
     [SerializeField]
-    [InfoBox("Generate a level for preview")]
+    [InfoBox("Generate a level for preview", InfoMessageType.Warning)]
     private Level debugLevel;
 
     [TitleGroup("Actions")]

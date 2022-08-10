@@ -68,6 +68,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Keys",
+            "id": "1185c3f8-7465-4af6-834f-4ed775b65cd1",
+            "actions": [
+                {
+                    "name": "Undo",
+                    "type": "Button",
+                    "id": "ef640f94-df21-47b5-8dc1-39332de32ef8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Reset",
+                    "type": "Button",
+                    "id": "f43456b7-b627-4e07-bf8b-4b6c44d2c4e0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "91db4f5b-01e6-41ab-aca3-75f9815e1edf",
+                    "path": "<Keyboard>/u",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Undo",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ce1806ad-318f-4aa2-8d92-316424629ed8",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Reset",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
