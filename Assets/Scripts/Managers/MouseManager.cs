@@ -72,6 +72,8 @@ public class MouseManager : GameSingleton<MouseManager>
     #region Custom Methods
     private void MouseClick(InputAction.CallbackContext ctx)
     {
+        if (GameManager.Instance.MovementLocked) return;
+
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 
@@ -102,6 +104,8 @@ public class MouseManager : GameSingleton<MouseManager>
 
     private void MouseMove(InputAction.CallbackContext ctx)
     {
+        if (GameManager.Instance.MovementLocked) return;
+
         if (!mouseSelection.HasValue) return;
 
         Vehicle selectedVehicle = mouseSelection.Value.Vehicle;
@@ -124,6 +128,8 @@ public class MouseManager : GameSingleton<MouseManager>
 
     private void MouseRelease(InputAction.CallbackContext ctx)
     {
+        if (GameManager.Instance.MovementLocked) return;
+
         if (!mouseSelection.HasValue) return;
 
         Vehicle selectedVehicle = mouseSelection.Value.Vehicle;

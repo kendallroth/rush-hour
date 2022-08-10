@@ -27,6 +27,7 @@ public class Board : GameSingleton<Board>
     #region Properties
     public Transform TileTransform => tileTransform;
     public Transform VehicleTransform => vehicleTransform;
+    public static int EXIT_START_POSITION => (EXIT_ROW_IDX * SIZE) + (SIZE - 2);
     #endregion
 
     private float boardTileSize => BoardGenerator.Instance.TileSize;
