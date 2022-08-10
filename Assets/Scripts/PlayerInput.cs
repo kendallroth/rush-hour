@@ -44,15 +44,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Delta"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""b2da674f-dd73-4b06-875a-1407729a2112"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -75,17 +66,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
                     ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""7751fdb7-1e84-4b02-8b70-e3f697e9072e"",
-                    ""path"": ""<Mouse>/delta"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard"",
-                    ""action"": ""Delta"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -163,7 +143,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
         m_Mouse_Click = m_Mouse.FindAction("Click", throwIfNotFound: true);
         m_Mouse_Move = m_Mouse.FindAction("Move", throwIfNotFound: true);
-        m_Mouse_Delta = m_Mouse.FindAction("Delta", throwIfNotFound: true);
         // Keys
         m_Keys = asset.FindActionMap("Keys", throwIfNotFound: true);
         m_Keys_Undo = m_Keys.FindAction("Undo", throwIfNotFound: true);
@@ -229,14 +208,12 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private IMouseActions m_MouseActionsCallbackInterface;
     private readonly InputAction m_Mouse_Click;
     private readonly InputAction m_Mouse_Move;
-    private readonly InputAction m_Mouse_Delta;
     public struct MouseActions
     {
         private @PlayerInput m_Wrapper;
         public MouseActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Click => m_Wrapper.m_Mouse_Click;
         public InputAction @Move => m_Wrapper.m_Mouse_Move;
-        public InputAction @Delta => m_Wrapper.m_Mouse_Delta;
         public InputActionMap Get() { return m_Wrapper.m_Mouse; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -252,9 +229,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Move.started -= m_Wrapper.m_MouseActionsCallbackInterface.OnMove;
                 @Move.performed -= m_Wrapper.m_MouseActionsCallbackInterface.OnMove;
                 @Move.canceled -= m_Wrapper.m_MouseActionsCallbackInterface.OnMove;
-                @Delta.started -= m_Wrapper.m_MouseActionsCallbackInterface.OnDelta;
-                @Delta.performed -= m_Wrapper.m_MouseActionsCallbackInterface.OnDelta;
-                @Delta.canceled -= m_Wrapper.m_MouseActionsCallbackInterface.OnDelta;
             }
             m_Wrapper.m_MouseActionsCallbackInterface = instance;
             if (instance != null)
@@ -265,9 +239,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
-                @Delta.started += instance.OnDelta;
-                @Delta.performed += instance.OnDelta;
-                @Delta.canceled += instance.OnDelta;
             }
         }
     }
@@ -326,7 +297,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     {
         void OnClick(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
-        void OnDelta(InputAction.CallbackContext context);
     }
     public interface IKeysActions
     {

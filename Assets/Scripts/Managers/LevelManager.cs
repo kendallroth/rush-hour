@@ -44,17 +44,12 @@ public class LevelManager : GameSingleton<LevelManager>
     {
         // TODO: Eventually load all levels (rather than serialize???)
 
-        LoadCurrentLevel();
+        LoadLevel(CurrentLevelNumber);
     }
     #endregion
 
 
     #region Custom Methods
-    public void LoadCurrentLevel()
-    {
-        LoadLevel(CurrentLevelNumber);
-    }
-
     public void LoadLevel(int level)
     {
         currentLevelNumber = level;

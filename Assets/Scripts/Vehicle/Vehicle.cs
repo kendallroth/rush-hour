@@ -31,9 +31,6 @@ public class Vehicle : MonoBehaviour
     #endregion
 
 
-    float originalY = 0f;
-
-
     #region Unity Methods
     #endregion
 
@@ -48,6 +45,9 @@ public class Vehicle : MonoBehaviour
         Length = position.Length;
     }
 
+    /// <summary>
+    /// Get world position of the vehicle's center
+    /// </summary>
     public Vector3 GetCenterWorldPosition()
     {
         float tileSize = BoardGenerator.Instance.TileSize;
@@ -73,7 +73,7 @@ public class Vehicle : MonoBehaviour
     /// </summary>
     /// <param name="startIdx">New vehicle start position index</param>
     /// <param name="snap">Whether to snap vehicle to required position after moving</param>
-    public void MoveToIndex(int startIdx, bool snap = true)
+    private void MoveToIndex(int startIdx, bool snap = true)
     {
         PositionIdxStart = startIdx;
 

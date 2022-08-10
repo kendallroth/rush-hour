@@ -33,6 +33,8 @@ public class GameManager : GameSingleton<GameManager>
     #region Properties
     [ShowInInspector]
     public int MoveCount => gameMoves.Count;
+
+    public Vehicle[] Vehicles => Board.Instance.Vehicles;
     #endregion
 
     private PlayerInput playerInput;
@@ -69,7 +71,11 @@ public class GameManager : GameSingleton<GameManager>
     #region Custom Methods
     public void PerformMove(Vehicle vehicle, int steps)
     {
+        // TODO: Potentially validate move (already technically handled by bounds)?
+
         vehicle.MoveByStep(steps);
+
+        // TODO: Detect game win
 
         gameMoves.Push(new GameMove(vehicle, steps));
 

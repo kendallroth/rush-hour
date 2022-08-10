@@ -162,6 +162,8 @@ public class MouseManager : GameSingleton<MouseManager>
     {
         if (!mouseSelection.HasValue) return;
 
+        if (!DebugManager.Instance.DrawVehicleBounds) return;
+
         VehicleMoveBounds moveBounds = mouseSelection.Value.MoveBounds;
 
         if (!moveBounds.GridLocked)

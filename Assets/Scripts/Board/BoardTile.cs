@@ -37,13 +37,19 @@ public class BoardTile : MonoBehaviourGizmos
         Quaternion rotation = Quaternion.Euler(90, 0, 0);
         Vector3 position = transform.position + Vector3.up * 0.02f;
 
-        Draw.Label3D(new float3(position.x, position.y, position.z), rotation, $"{Coordinates.X},{Coordinates.Y}", 0.2f, LabelAlignment.Center);
-        Draw.Label3D(new float3(position.x, position.y, position.z - 0.25f), rotation, $"{Index}", 0.13f, LabelAlignment.Center);
+        if (DebugManager.Instance.DrawTileCoordinates)
+        {
+            Draw.Label3D(new float3(position.x, position.y, position.z), rotation, $"{Coordinates.X},{Coordinates.Y}", 0.2f, LabelAlignment.Center);
+            Draw.Label3D(new float3(position.x, position.y, position.z - 0.25f), rotation, $"{Index}", 0.13f, LabelAlignment.Center);
+        }
 
-        Draw.SolidCircle(new float3(position.x - 0.5f, position.y, position.z - 0.5f), Vector3.up, 0.025f);
-        Draw.SolidCircle(new float3(position.x + 0.5f, position.y, position.z - 0.5f), Vector3.up, 0.025f);
-        Draw.SolidCircle(new float3(position.x - 0.5f, position.y, position.z + 0.5f), Vector3.up, 0.025f);
-        Draw.SolidCircle(new float3(position.x + 0.5f, position.y, position.z + 0.5f), Vector3.up, 0.025f);
+        if (DebugManager.Instance.DrawTileBorders)
+        {
+            Draw.SolidCircle(new float3(position.x - 0.5f, position.y, position.z - 0.5f), Vector3.up, 0.025f);
+            Draw.SolidCircle(new float3(position.x + 0.5f, position.y, position.z - 0.5f), Vector3.up, 0.025f);
+            Draw.SolidCircle(new float3(position.x - 0.5f, position.y, position.z + 0.5f), Vector3.up, 0.025f);
+            Draw.SolidCircle(new float3(position.x + 0.5f, position.y, position.z + 0.5f), Vector3.up, 0.025f);
+        }
     }
     #endregion
 }
