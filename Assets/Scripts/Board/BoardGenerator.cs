@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+public class VehicleColorDictionary : UnitySerializedDictionary<string, Color> { }
+
 public class BoardGenerator : GameSingleton<BoardGenerator>
 {
     #region Attributes
@@ -24,6 +27,10 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
     [Required]
     private GameObject carPlayerPrefab;
 
+    [Header("Colors")]
+    [SerializeField]
+    private VehicleColorDictionary vehicleColors = new VehicleColorDictionary();
+
     [Header("Level")]
     [InfoBox("Generate a level for preview", InfoMessageType.Warning)]
     [InfoBox("AA...OP..Q.OPXXQ.OP..Q..B...CCB.RRR.", InfoMessageType.None)]
@@ -42,6 +49,7 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
 
     #region Properties
     public float TileSize => 1f;
+    public Dictionary<string, Color> VehicleColors => vehicleColors;
     #endregion
 
     private Board _board;

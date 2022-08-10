@@ -31,6 +31,8 @@ public class Vehicle : MonoBehaviour
     #endregion
 
 
+
+
     #region Unity Methods
     #endregion
 
@@ -43,6 +45,16 @@ public class Vehicle : MonoBehaviour
         PositionIdxStart = position.PositionIdx;
         PlayerVehicle = position.PlayerVehicle;
         Length = position.Length;
+
+        Color vehicleColor = BoardGenerator.Instance.VehicleColors.GetValueOrDefault(position.Key, Color.gray);
+
+        // NOTE: No need to cache since "Init" is only called once per level
+        MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
+        Renderer renderer = GetComponentInChildren<Renderer>();
+
+        renderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetColor("_BaseColor", vehicleColor);
+        renderer.SetPropertyBlock(propertyBlock);
     }
 
     /// <summary>
