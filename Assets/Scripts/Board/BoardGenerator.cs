@@ -101,8 +101,8 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
 
     private void SpawnExit()
     {
-        Vector3 exitPosition = new Vector3(Board.SIZE * TileSize - TileSize / 2, 0, -Board.EXIT_ROW_IDX * TileSize);
-        Instantiate(exitPrefab, exitPosition, Quaternion.identity, board.TileTransform);
+        //Vector3 exitPosition = board.ExitTransform.position;
+        //Instantiate(exitPrefab, exitPosition, Quaternion.identity, board.TileTransform);
     }
 
     private BoardTile[,] SpawnTiles()

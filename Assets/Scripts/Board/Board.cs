@@ -18,6 +18,9 @@ public class Board : GameSingleton<Board>
     [SerializeField]
     [Required]
     private Transform vehicleTransform;
+    [SerializeField]
+    [Required]
+    private Transform exitTransform;
 
     public BoardTile[,] Tiles { get; private set; }
     public Vehicle[] Vehicles { get; private set; }
@@ -25,6 +28,7 @@ public class Board : GameSingleton<Board>
 
 
     #region Properties
+    public Transform ExitTransform => exitTransform;
     public Transform TileTransform => tileTransform;
     public Transform VehicleTransform => vehicleTransform;
     public static int EXIT_START_POSITION => (EXIT_ROW_IDX * SIZE) + (SIZE - 2);
@@ -40,6 +44,7 @@ public class Board : GameSingleton<Board>
     #region Custom Methods
     public void ClearTiles()
     {
+        exitTransform.RemoveChildren();
         tileTransform.RemoveChildren();
         Tiles = new BoardTile[,] { };
     }
