@@ -1,9 +1,10 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Difficulty
+public enum LevelDifficulty
 {
     EASY,
     MEDIUM,
@@ -14,7 +15,9 @@ public enum Difficulty
 public class Level
 {
     #region Properties
-    public Difficulty Difficulty;
+    [ReadOnly]
+    public int Number;
+    public LevelDifficulty Difficulty;
     /// <summary>
     /// Minimum number of necessary moves to solve
     /// </summary>

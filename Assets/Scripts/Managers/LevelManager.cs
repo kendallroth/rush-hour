@@ -15,6 +15,8 @@ public class LevelManager : GameSingleton<LevelManager>
     [SerializeField]
     private List<Level> levels = new List<Level>();
 
+    [TitleGroup("Actions")]
+    [PropertySpace(SpaceAfter = 8, SpaceBefore = 0)]
     [Button("Generate Current Level")]
     public void GenerateLevelClick()
     {
@@ -25,6 +27,30 @@ public class LevelManager : GameSingleton<LevelManager>
         }
 
         LoadCurrentLevel();
+    }
+
+    [HorizontalGroup("Actions/Load")]
+    [Button("Load All Levels")]
+    public void LoadLevelsClick() => LoadAllLevels();
+
+    [HorizontalGroup("Actions/Load")]
+    [Button("Validate Levels")]
+    public void ValidateLevelsClick()
+    {
+        var validation = ValidateLevels();
+        if (validation.valid)
+        {
+            EditorUtility.DisplayDialog("Levels validated", "All levels have been validated", "Close");
+        }
+        else
+        {
+            string failedLevels = "\n";
+            validation.invalidLevels.ForEach((level) =>
+            {
+                failedLevels += $"\n • Level {level.Number}";
+            });
+            EditorUtility.DisplayDialog("Levels validation failed", $"Level validation failed for {validation.invalidLevels.Count} levels.{failedLevels}", "Close");
+        }
     }
     #endregion
 
@@ -43,12 +69,25 @@ public class LevelManager : GameSingleton<LevelManager>
     #region Unity Methods
     private void Awake()
     {
-        // TODO: Eventually load all levels (rather than serialize???)
+        LoadAllLevels();
     }
     #endregion
 
 
     #region Custom Methods
+    private void LoadAllLevels()
+    {
+        // TODO: Eventually load levels from textfile (rather than serialize???)
+        // TODO: Combine unlocked level stats
+
+        // Assign level numbers
+        for (int i = 0; i < levels.Count; i++)
+        {
+            Level level = levels[i];
+            level.Number = i + 1;
+        }
+    }
+
     public void LoadCurrentLevel()
     {
         LoadLevel(CurrentLevelNumber);
@@ -69,6 +108,22 @@ public class LevelManager : GameSingleton<LevelManager>
     public void LoadPreviousLevel()
     {
         LoadLevel(CurrentLevelNumber - 1);
+    }
+
+    public (bool valid, List<Level> invalidLevels) ValidateLevels()
+    {
+        List<Level> invalidLevels = new List<Level>();
+
+        levels.ForEach((level) =>
+        {
+            bool valid = BoardGenerator.Instance.ValidateLevel(level.LayoutString);
+            if (!valid)
+            {
+                invalidLevels.Add(level);
+            }
+        });
+
+        return (invalidLevels.Count == 0, invalidLevels);
     }
     #endregion
 }

@@ -25,8 +25,9 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
     private GameObject carPlayerPrefab;
 
     [Header("Level")]
-    [SerializeField]
     [InfoBox("Generate a level for preview", InfoMessageType.Warning)]
+    [InfoBox("AA...OP..Q.OPXXQ.OP..Q..B...CCB.RRR.", InfoMessageType.None)]
+    [SerializeField]
     private Level debugLevel;
 
     [TitleGroup("Actions")]
@@ -60,7 +61,7 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
         ClearBoard();
 
         // Parse and validate vehicle positions
-        List<VehicleConfig> vehiclePositions = ParseVehiclePositions(level);
+        List<VehicleConfig> vehiclePositions = ParseVehiclePositions(level.LayoutString);
         Debug.Log($"Parsed {vehiclePositions.Count} positions");
 
         BoardTile[,] tiles = SpawnTiles();
@@ -136,22 +137,40 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
     }
 
     /// <summary>
+    /// Validate a level string
+    /// </summary>
+    public bool ValidateLevel(string levelString)
+    {
+        try
+        {
+            ParseVehiclePositions(levelString);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Parse and validate vehicle positions from a level layout string
     /// </summary>
     /// <returns>Level vehicle positions</returns>
     /// <exception cref="Exception">Level validation errors</exception>
-    private List<VehicleConfig> ParseVehiclePositions(Level level)
+    private List<VehicleConfig> ParseVehiclePositions(string layoutString)
     {
-        if (level.LayoutString.Length != Board.SIZE * Board.SIZE)
+        if (layoutString.Length != Board.SIZE * Board.SIZE)
         {
-            throw new Exception($"Invalid level string (size: {level.LayoutString.Length})");
+            throw new Exception($"Invalid level string (size: {layoutString.Length})");
         }
+
+        bool hasPlayer = false;
 
         // Parse all tiles from level string
         Dictionary<string, List<int>> tileMap = new Dictionary<string, List<int>>();
-        for (int idx = 0; idx < level.LayoutString.Length; idx++)
+        for (int idx = 0; idx < layoutString.Length; idx++)
         {
-            string tileChar = level.LayoutString[idx].ToString();
+            string tileChar = layoutString[idx].ToString();
             if (!tileMap.ContainsKey(tileChar))
             {
                 tileMap.Add(tileChar, new List<int>());
@@ -192,12 +211,18 @@ public class BoardGenerator : GameSingleton<BoardGenerator>
             }
 
             VehicleConfig position = new VehicleConfig(key, keyPositions[0], keyPositions.Count, idxStride);
-            if (key == "A")
+            if (key == "X")
             {
+                hasPlayer = true;
                 position.SetPlayer();
             }
 
             vehiclePositions.Add(position);
+        }
+
+        if (!hasPlayer)
+        {
+            throw new Exception("No player vehicle found");
         }
 
         return vehiclePositions;

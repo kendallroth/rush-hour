@@ -15,6 +15,9 @@ public class GameUI : MonoBehaviour
     [Required]
     [SerializeField]
     private TextMeshProUGUI moveCounterText;
+    [Required]
+    [SerializeField]
+    private TextMeshProUGUI moveMaximumText;
     #endregion
 
 
@@ -25,8 +28,9 @@ public class GameUI : MonoBehaviour
     #region Unity Methods
     private void Awake()
     {
-        levelNumberText.text = "Level: -";
-        moveCounterText.text = "Moves: - / -";
+        levelNumberText.text = "-";
+        moveCounterText.text = "0";
+        moveMaximumText.text = "/ 0";
 
         MessageDispatcher.AddListener(GameEvents.GAME__COMPLETE, OnGameComplete);
         MessageDispatcher.AddListener(GameEvents.LEVEL__COMPLETE, OnLevelComplete);
@@ -67,27 +71,22 @@ public class GameUI : MonoBehaviour
     private void OnLevelStart(IMessage message)
     {
         LevelStartData data = (LevelStartData)message.Data;
-        levelNumberText.text = $"Level: {data.LevelNumber}";
-        moveCounterText.text = $"Moves: 0 / {data.Level.Moves}";
+        levelNumberText.text = $"{data.LevelNumber}";
+        moveCounterText.text = "0";
+        moveMaximumText.text = $"/ {data.Level.Moves}";
     }
 
     private void OnLevelReset(IMessage message)
     {
         LevelResetData data = (LevelResetData)message.Data;
-        moveCounterText.text = $"Moves: 0 / {data.Level.Moves}";
+        moveCounterText.text = "0";
+        moveMaximumText.text = $"/ {data.Level.Moves}";
     }
 
     private void OnMoveOperation(IMessage message)
     {
-        int slashIdx = moveCounterText.text.LastIndexOf("/");
-        string levelMoves = "-";
-        if (slashIdx != -1)
-        {
-            levelMoves = moveCounterText.text[(slashIdx + 2)..];
-        }
-
         MoveOperationData data = (MoveOperationData)message.Data;
-        moveCounterText.text = $"Moves: {data.MoveCounter} / {levelMoves}";
+        moveCounterText.text = $"{data.MoveCounter}";
     }
     #endregion
 }
