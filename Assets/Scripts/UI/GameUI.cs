@@ -30,7 +30,7 @@ public class GameUI : MonoBehaviour
     {
         levelNumberText.text = "-";
         moveCounterText.text = "0";
-        moveMaximumText.text = "/ 0";
+        moveMaximumText.text = "/ 00";
 
         MessageDispatcher.AddListener(GameEvents.GAME__COMPLETE, OnGameComplete);
         MessageDispatcher.AddListener(GameEvents.LEVEL__COMPLETE, OnLevelComplete);
@@ -73,14 +73,14 @@ public class GameUI : MonoBehaviour
         LevelStartData data = (LevelStartData)message.Data;
         levelNumberText.text = $"{data.LevelNumber}";
         moveCounterText.text = "0";
-        moveMaximumText.text = $"/ {data.Level.Moves}";
+        moveMaximumText.text = $"/ {data.Level.Moves:D2}";
     }
 
     private void OnLevelReset(IMessage message)
     {
         LevelResetData data = (LevelResetData)message.Data;
         moveCounterText.text = "0";
-        moveMaximumText.text = $"/ {data.Level.Moves}";
+        moveMaximumText.text = $"/ {data.Level.Moves:D2}";
     }
 
     private void OnMoveOperation(IMessage message)
