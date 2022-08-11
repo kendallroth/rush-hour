@@ -4,7 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(BoardGenerator))]
+[RequireComponent(typeof(TileGenerator))]
+[RequireComponent(typeof(VehicleGenerator))]
 public class Board : GameSingleton<Board>
 {
     public const int SIZE = 6;
@@ -22,19 +23,33 @@ public class Board : GameSingleton<Board>
     [Required]
     private Transform exitTransform;
 
-    public BoardTile[,] Tiles { get; private set; }
-    public Vehicle[] Vehicles { get; private set; }
+    [Header("Level")]
+    [InfoBox("Generate a level for preview", InfoMessageType.Warning)]
+    [InfoBox("AA...OP..Q.OPXXQ.OP..Q..B...CCB.RRR.", InfoMessageType.None)]
+    [SerializeField]
+    private Level debugLevel;
+
+    [TitleGroup("Actions")]
+    [HorizontalGroup("Actions/Actions")]
+    [Button("Generate (Debug)")]
+    private void GenerateClick() => GenerateBoard(debugLevel);
+    [HorizontalGroup("Actions/Actions")]
+    [Button("Clear")]
+    private void ClearClick() => ClearBoard();
     #endregion
 
 
     #region Properties
+    public BoardTile[,] Tiles { get; private set; }
+    public Vehicle[] Vehicles { get; private set; }
+
     public Transform ExitTransform => exitTransform;
     public Transform TileTransform => tileTransform;
     public Transform VehicleTransform => vehicleTransform;
-    public static int EXIT_START_POSITION => (EXIT_ROW_IDX * SIZE) + (SIZE - 2);
-    #endregion
 
-    private float boardTileSize => BoardGenerator.Instance.TileSize;
+    public static int EXIT_START_POSITION => (EXIT_ROW_IDX * SIZE) + (SIZE - 2);
+    public float TileSize => 1f;
+    #endregion
 
 
     #region Unity Methods
@@ -42,17 +57,40 @@ public class Board : GameSingleton<Board>
 
 
     #region Custom Methods
-    public void ClearTiles()
+    public void ClearBoard()
+    {
+        Debug.Log("Clearing game board");
+
+        ClearTiles();
+        ClearVehicles();
+    }
+
+    private void ClearTiles()
     {
         exitTransform.RemoveChildren();
         tileTransform.RemoveChildren();
         Tiles = new BoardTile[,] { };
     }
 
-    public void ClearVehicles()
+    private void ClearVehicles()
     {
         vehicleTransform.RemoveChildren();
         Vehicles = new Vehicle[] { };
+    }
+
+    public void GenerateBoard(Level level)
+    {
+        ClearBoard();
+
+        TileGenerator tileGenerator = GetComponent<TileGenerator>();
+        VehicleGenerator vehicleGenerator = GetComponent<VehicleGenerator>();
+
+        List<VehicleConfig> vehiclePositions = level.ParseVehiclePositions();
+        Debug.Log($"Parsed {vehiclePositions.Count} positions");
+
+        Tiles = tileGenerator.SpawnTiles();
+
+        Vehicles = vehicleGenerator.SpawnVehicles(vehiclePositions);
     }
 
     /// <summary>
@@ -104,14 +142,14 @@ public class Board : GameSingleton<Board>
 
         int forwardStartIdx = vehicle.PositionIdxStart - -stepsBackward * vehicle.IdxStride;
         Coordinates forwardStartCoordinates = Coordinates.FromPositionIndex(forwardStartIdx);
-        Vector3 forwardStartPosition = forwardStartCoordinates.GetWorldPosition(boardTileSize);
+        Vector3 forwardStartPosition = forwardStartCoordinates.GetWorldPosition(TileSize);
 
         int backwardEndIdx = vehicle.PositionIdxEnd + stepsForward * vehicle.IdxStride;
         Coordinates backwardEndCoordinates = Coordinates.FromPositionIndex(backwardEndIdx);
-        Vector3 backwardEndPosition = backwardEndCoordinates.GetWorldPosition(boardTileSize);
+        Vector3 backwardEndPosition = backwardEndCoordinates.GetWorldPosition(TileSize);
 
-        Vector3 forwardEndCenter = Vector3Extensions.PointAlongLine(forwardStartPosition, backwardEndPosition, boardTileSize * vehicle.Length / 2 - boardTileSize / 2);
-        Vector3 backwardStartCenter = Vector3Extensions.PointAlongLine(forwardStartPosition, backwardEndPosition, boardTileSize * vehicle.Length / 2 - boardTileSize / 2, true);
+        Vector3 forwardEndCenter = Vector3Extensions.PointAlongLine(forwardStartPosition, backwardEndPosition, TileSize * vehicle.Length / 2 - TileSize / 2);
+        Vector3 backwardStartCenter = Vector3Extensions.PointAlongLine(forwardStartPosition, backwardEndPosition, TileSize * vehicle.Length / 2 - TileSize / 2, true);
 
         return new VehicleMoveBounds
         {
@@ -147,16 +185,6 @@ public class Board : GameSingleton<Board>
         }
 
         return null;
-    }
-
-    public void SetTiles(BoardTile[,] tiles)
-    {
-        Tiles = tiles;
-    }
-
-    public void SetVehicles(Vehicle[] vehicles)
-    {
-        Vehicles = vehicles;
     }
     #endregion
 }

@@ -38,7 +38,7 @@ public class Vehicle : MonoBehaviour
 
 
     #region Custom Methods
-    public void Init(VehicleConfig position)
+    public void Init(VehicleConfig position, Color color)
     {
         Key = position.Key;
         IdxStride = position.IdxStride;
@@ -46,14 +46,12 @@ public class Vehicle : MonoBehaviour
         PlayerVehicle = position.PlayerVehicle;
         Length = position.Length;
 
-        Color vehicleColor = BoardGenerator.Instance.VehicleColors.GetValueOrDefault(position.Key, Color.gray);
-
         // NOTE: No need to cache since "Init" is only called once per level
         MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
         Renderer renderer = GetComponentInChildren<Renderer>();
 
         renderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetColor("_BaseColor", vehicleColor);
+        propertyBlock.SetColor("_BaseColor", color);
         renderer.SetPropertyBlock(propertyBlock);
     }
 
@@ -62,7 +60,7 @@ public class Vehicle : MonoBehaviour
     /// </summary>
     public Vector3 GetCenterWorldPosition()
     {
-        float tileSize = BoardGenerator.Instance.TileSize;
+        float tileSize = Board.Instance.TileSize;
         Vector3 start = CoordinatesStart.GetWorldPosition(tileSize);
         Vector3 end = CoordinatesEnd.GetWorldPosition(tileSize);
 

@@ -37,7 +37,7 @@ public class MouseManager : GameSingleton<MouseManager>
     #endregion
 
     private PlayerInput playerInput;
-    private float boardTileSize => BoardGenerator.Instance.TileSize;
+    private float boardTileSize => Board.Instance.TileSize;
 
     /// <summary>
     /// Cached mouse selection data (vehicle, drag positioning, bounds, etc)

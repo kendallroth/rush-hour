@@ -97,7 +97,7 @@ public class LevelManager : GameSingleton<LevelManager>
     {
         currentLevelNumber = level;
 
-        BoardGenerator.Instance.GenerateBoard(CurrentLevel);
+        Board.Instance.GenerateBoard(CurrentLevel);
     }
 
     public void LoadNextLevel()
@@ -116,7 +116,7 @@ public class LevelManager : GameSingleton<LevelManager>
 
         levels.ForEach((level) =>
         {
-            bool valid = BoardGenerator.Instance.ValidateLevel(level.LayoutString);
+            bool valid = level.Validate();
             if (!valid)
             {
                 invalidLevels.Add(level);
