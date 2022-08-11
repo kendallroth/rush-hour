@@ -13,7 +13,6 @@ public class Vehicle : MonoBehaviour
 
 
     #region Properties
-
     public int PositionIdxStart { get; private set; }
     public int PositionIdxEnd => PositionIdxStart + IdxStride * (Length - 1);
 
@@ -30,10 +29,16 @@ public class Vehicle : MonoBehaviour
     public Orientation Orientation => IdxStride == 1 ? Orientation.HORIZONTAL : Orientation.VERTICAL;
     #endregion
 
-
+    private Transform vehicleTransform;
+    private Vector3 restingPosition;
 
 
     #region Unity Methods
+    private void Awake()
+    {
+        vehicleTransform = transform.GetChild(0);
+        restingPosition = vehicleTransform.localPosition;
+    }
     #endregion
 
 
@@ -99,6 +104,30 @@ public class Vehicle : MonoBehaviour
     public void Snap()
     {
         transform.position = GetCenterWorldPosition();
+    }
+
+    /// <summary>
+    /// Toggle whether vehicle is visible (active or inactive)
+    /// </summary>
+    public void ToggleVisibility(bool visible)
+    {
+        gameObject.SetActive(visible);
+    }
+
+    /// <summary>
+    /// Raise a vehicle when grabbed
+    /// </summary>
+    public void GrabStart()
+    {
+        vehicleTransform.localPosition = restingPosition + Vector3.up * 0.1f;
+    }
+
+    /// <summary>
+    /// Drop a vehicle after releasing
+    /// </summary>
+    public void GrabEnd()
+    {
+        vehicleTransform.localPosition = restingPosition;
     }
     #endregion
 }

@@ -100,6 +100,8 @@ public class MouseManager : GameSingleton<MouseManager>
             MoveBounds = moveBounds,
             Vehicle = vehicle,
         };
+
+        vehicle.GrabStart();
     }
 
     private void MouseMove(InputAction.CallbackContext ctx)
@@ -152,6 +154,8 @@ public class MouseManager : GameSingleton<MouseManager>
         {
             selectedVehicle.Snap();
         }
+
+        selectedVehicle.GrabEnd();
 
         ClearSelection();
     }

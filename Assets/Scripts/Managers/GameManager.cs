@@ -94,8 +94,6 @@ public class GameManager : GameSingleton<GameManager>
     {
         MovementLocked = false;
 
-        // TODO
-
         LevelStartData levelStartData = new LevelStartData(CurrentLevel, LevelNumber);
         MessageDispatcher.SendMessageData(GameEvents.LEVEL__START, levelStartData, -1);
     }
