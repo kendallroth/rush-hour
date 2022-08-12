@@ -118,6 +118,54 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Debug"",
+            ""id"": ""136969f4-cd27-48c1-beea-ec85fbdf1bfb"",
+            ""actions"": [
+                {
+                    ""name"": ""NextLevel"",
+                    ""type"": ""Button"",
+                    ""id"": ""0b947295-dbef-4bcc-b3f0-30f516c3942d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PreviousLevel"",
+                    ""type"": ""Button"",
+                    ""id"": ""7e81a762-acce-488c-9262-619f735b5171"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""92eef01a-94d1-4827-800d-7c7795c08dd5"",
+                    ""path"": ""<Keyboard>/equals"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""NextLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2dbeecd1-815e-4099-a516-d10b9b0f8c6a"",
+                    ""path"": ""<Keyboard>/minus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""PreviousLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -147,6 +195,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_Keys = asset.FindActionMap("Keys", throwIfNotFound: true);
         m_Keys_Undo = m_Keys.FindAction("Undo", throwIfNotFound: true);
         m_Keys_Reset = m_Keys.FindAction("Reset", throwIfNotFound: true);
+        // Debug
+        m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
+        m_Debug_NextLevel = m_Debug.FindAction("NextLevel", throwIfNotFound: true);
+        m_Debug_PreviousLevel = m_Debug.FindAction("PreviousLevel", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -284,6 +336,47 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         }
     }
     public KeysActions @Keys => new KeysActions(this);
+
+    // Debug
+    private readonly InputActionMap m_Debug;
+    private IDebugActions m_DebugActionsCallbackInterface;
+    private readonly InputAction m_Debug_NextLevel;
+    private readonly InputAction m_Debug_PreviousLevel;
+    public struct DebugActions
+    {
+        private @PlayerInput m_Wrapper;
+        public DebugActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @NextLevel => m_Wrapper.m_Debug_NextLevel;
+        public InputAction @PreviousLevel => m_Wrapper.m_Debug_PreviousLevel;
+        public InputActionMap Get() { return m_Wrapper.m_Debug; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(DebugActions set) { return set.Get(); }
+        public void SetCallbacks(IDebugActions instance)
+        {
+            if (m_Wrapper.m_DebugActionsCallbackInterface != null)
+            {
+                @NextLevel.started -= m_Wrapper.m_DebugActionsCallbackInterface.OnNextLevel;
+                @NextLevel.performed -= m_Wrapper.m_DebugActionsCallbackInterface.OnNextLevel;
+                @NextLevel.canceled -= m_Wrapper.m_DebugActionsCallbackInterface.OnNextLevel;
+                @PreviousLevel.started -= m_Wrapper.m_DebugActionsCallbackInterface.OnPreviousLevel;
+                @PreviousLevel.performed -= m_Wrapper.m_DebugActionsCallbackInterface.OnPreviousLevel;
+                @PreviousLevel.canceled -= m_Wrapper.m_DebugActionsCallbackInterface.OnPreviousLevel;
+            }
+            m_Wrapper.m_DebugActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @NextLevel.started += instance.OnNextLevel;
+                @NextLevel.performed += instance.OnNextLevel;
+                @NextLevel.canceled += instance.OnNextLevel;
+                @PreviousLevel.started += instance.OnPreviousLevel;
+                @PreviousLevel.performed += instance.OnPreviousLevel;
+                @PreviousLevel.canceled += instance.OnPreviousLevel;
+            }
+        }
+    }
+    public DebugActions @Debug => new DebugActions(this);
     private int m_KeyboardSchemeIndex = -1;
     public InputControlScheme KeyboardScheme
     {
@@ -302,5 +395,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     {
         void OnUndo(InputAction.CallbackContext context);
         void OnReset(InputAction.CallbackContext context);
+    }
+    public interface IDebugActions
+    {
+        void OnNextLevel(InputAction.CallbackContext context);
+        void OnPreviousLevel(InputAction.CallbackContext context);
     }
 }

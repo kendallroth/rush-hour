@@ -37,12 +37,7 @@ public class GameManager : GameSingleton<GameManager>
     public int LevelNumber => LevelManager.Instance.CurrentLevelNumber;
     [ShowInInspector]
     public int MoveCount => gameMoves.Count;
-    /// <summary>
-    /// Whether movement is locked (after winning, etc)
-    /// </summary>
-    [ReadOnly]
-    [ShowInInspector]
-    public bool MovementLocked { get; private set; } = false;
+    public bool LevelComplete { get; private set; } = false;
 
     public Vehicle[] Vehicles => Board.Instance.Vehicles;
     #endregion
@@ -60,12 +55,16 @@ public class GameManager : GameSingleton<GameManager>
 
     private void Start()
     {
+        LevelComplete = false;
         LevelManager.Instance.LoadCurrentLevel();
         LevelStart();
     }
 
     private void OnEnable()
     {
+        playerInput.Debug.Enable();
+        playerInput.Debug.NextLevel.performed += NextLevelHandler;
+
         playerInput.Keys.Enable();
         playerInput.Keys.Undo.performed += UndoLastMoveHandler;
         playerInput.Keys.Reset.performed += ResetHandler;
@@ -73,6 +72,9 @@ public class GameManager : GameSingleton<GameManager>
 
     private void OnDisable()
     {
+        playerInput.Debug.Disable();
+        playerInput.Debug.NextLevel.performed -= NextLevelHandler;
+
         playerInput.Keys.Disable();
         playerInput.Keys.Undo.performed -= UndoLastMoveHandler;
         playerInput.Keys.Reset.performed -= ResetHandler;
@@ -81,6 +83,11 @@ public class GameManager : GameSingleton<GameManager>
     // "Temporary" functions to void subscribing with lambda function
     private void UndoLastMoveHandler(InputAction.CallbackContext ctx) => PerformUndo();
     private void ResetHandler(InputAction.CallbackContext ctx) => PerformReset();
+    private void NextLevelHandler(InputAction.CallbackContext ctx)
+    {
+        LevelFinish();
+        StartNextLevel();
+    }
     #endregion
 
 
@@ -92,7 +99,8 @@ public class GameManager : GameSingleton<GameManager>
 
     private void LevelStart()
     {
-        MovementLocked = false;
+        LevelComplete = false;
+        gameMoves.Clear();
 
         LevelStartData levelStartData = new LevelStartData(CurrentLevel, LevelNumber);
         MessageDispatcher.SendMessageData(GameEvents.LEVEL__START, levelStartData, -1);
@@ -100,32 +108,30 @@ public class GameManager : GameSingleton<GameManager>
 
     private void LevelFinish()
     {
-        MovementLocked = true;
+        LevelComplete = true;
 
-        int previousMoveCount = MoveCount;
-        gameMoves.Clear();
+        // NOTE: Cannot clear move stack as player can still reset level (currently requires undoing moves by count)
 
-        LevelCompleteData levelCompleteData = new LevelCompleteData(CurrentLevel, LevelNumber, previousMoveCount);
+        LevelCompleteData levelCompleteData = new LevelCompleteData(CurrentLevel, LevelNumber, MoveCount);
         MessageDispatcher.SendMessageData(GameEvents.LEVEL__COMPLETE, levelCompleteData);
 
-        this.Wait(1f, () =>
+        if (!LevelManager.Instance.HasNextLevel)
         {
-            bool hasNextLevel = LevelManager.Instance.HasNextLevel;
-            if (hasNextLevel)
-            {
-                LevelManager.Instance.LoadNextLevel();
-                LevelStart();
-            }
-            else
-            {
-                GameFinish();
-            }
-        });
+            GameFinish();
+        }
+    }
+
+    public void StartNextLevel()
+    {
+        if (!LevelComplete) return;
+
+        LevelManager.Instance.LoadNextLevel();
+        LevelStart();
     }
 
     public void PerformMove(Vehicle vehicle, int steps)
     {
-        if (MovementLocked) return;
+        if (LevelComplete) return;
 
         // TODO: Potentially validate move (already technically handled by bounds)?
 
@@ -145,7 +151,7 @@ public class GameManager : GameSingleton<GameManager>
 
     public void PerformUndo()
     {
-        if (MovementLocked || MoveCount <= 0) return;
+        if (LevelComplete || MoveCount <= 0) return;
 
         // Retrieve last move before undoing to be able to access after
         GameMove move = gameMoves.Peek();
@@ -158,7 +164,9 @@ public class GameManager : GameSingleton<GameManager>
 
     public void PerformReset()
     {
-        if (MovementLocked || MoveCount <= 0) return;
+        // Allow resetting level even after completion
+        if (MoveCount <= 0) return;
+        LevelComplete = false;
 
         int previousMoveCount = MoveCount;
         UndoMoves(MoveCount);
@@ -169,7 +177,7 @@ public class GameManager : GameSingleton<GameManager>
 
     private void UndoMoves(int moves = 1)
     {
-        if (MovementLocked || MoveCount <= 0) return;
+        if (LevelComplete || MoveCount <= 0) return;
 
         int maxMoves = MoveCount;
 

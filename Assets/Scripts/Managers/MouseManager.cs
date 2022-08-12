@@ -72,7 +72,7 @@ public class MouseManager : GameSingleton<MouseManager>
     #region Custom Methods
     private void MouseClick(InputAction.CallbackContext ctx)
     {
-        if (GameManager.Instance.MovementLocked) return;
+        if (GameManager.Instance.LevelComplete) return;
 
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
@@ -106,7 +106,7 @@ public class MouseManager : GameSingleton<MouseManager>
 
     private void MouseMove(InputAction.CallbackContext ctx)
     {
-        if (GameManager.Instance.MovementLocked) return;
+        if (GameManager.Instance.LevelComplete) return;
 
         if (!mouseSelection.HasValue) return;
 
@@ -130,7 +130,7 @@ public class MouseManager : GameSingleton<MouseManager>
 
     private void MouseRelease(InputAction.CallbackContext ctx)
     {
-        if (GameManager.Instance.MovementLocked) return;
+        if (GameManager.Instance.LevelComplete) return;
 
         if (!mouseSelection.HasValue) return;
 
